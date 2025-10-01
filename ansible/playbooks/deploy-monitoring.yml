@@ -1,0 +1,35 @@
+---
+# Deploy monitoring infrastructure
+# This playbook sets up monitoring for the container orchestration system
+
+- name: Deploy monitoring tools
+  hosts: monitoring
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    monitoring_user: monitoring
+    monitoring_dir: /opt/monitoring
+  
+  tasks:
+    - name: Create monitoring user
+      user:
+        name: "{{ monitoring_user }}"
+        shell: /bin/bash
+        create_home: yes
+        state: present
+    
+    - name: Create monitoring directory
+      file:
+        path: "{{ monitoring_dir }}"
+        state: directory
+        owner: "{{ monitoring_user }}"
+        group: "{{ monitoring_user }}"
+        mode: '0755'
+    
+    - name: Display monitoring setup message
+      debug:
+        msg: "Monitoring infrastructure prepared on {{ inventory_hostname }}"
+
+# Note: Add specific monitoring tool deployment tasks here
+# Examples: Prometheus, Grafana, Node Exporter, cAdvisor, etc.
