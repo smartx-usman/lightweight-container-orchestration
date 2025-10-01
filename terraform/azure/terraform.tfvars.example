@@ -1,0 +1,19 @@
+# Azure Configuration
+azure_region = "East US"
+
+# Cluster Configuration
+cluster_name = "lightweight-container-cluster"
+environment  = "dev"
+
+# Network Configuration
+vnet_cidr        = "10.0.0.0/16"
+subnet_cidr      = "10.0.1.0/24"
+allowed_ssh_cidr = ["0.0.0.0/0"] # Replace with your IP for better security
+
+# VM Configuration
+admin_username       = "azureuser"
+ssh_public_key_path  = "~/.ssh/id_rsa.pub"
+master_vm_size       = "Standard_B2s"
+worker_vm_size       = "Standard_B1s"
+worker_count         = 2
+os_disk_size         = 30

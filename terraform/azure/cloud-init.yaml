@@ -1,0 +1,15 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - software-properties-common
+
+runcmd:
+  - hostnamectl set-hostname ${node_type}
+  - echo "Node type: ${node_type}" > /etc/node-info.txt

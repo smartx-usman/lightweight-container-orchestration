@@ -1,0 +1,19 @@
+# GCP Configuration
+project_id = "your-gcp-project-id" # Replace with your GCP project ID
+gcp_region = "us-central1"
+
+# Cluster Configuration
+cluster_name = "lightweight-container-cluster"
+environment  = "dev"
+
+# Network Configuration
+subnet_cidr      = "10.0.1.0/24"
+allowed_ssh_cidr = ["0.0.0.0/0"] # Replace with your IP for better security
+
+# Instance Configuration
+ssh_username         = "gcpuser"
+ssh_public_key_path  = "~/.ssh/id_rsa.pub"
+master_machine_type  = "e2-medium"
+worker_machine_type  = "e2-small"
+worker_count         = 2
+boot_disk_size       = 30

@@ -1,0 +1,47 @@
+---
+- name: Deploy Monitoring Stack
+  hosts: master
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Create monitoring directory
+      file:
+        path: /opt/monitoring
+        state: directory
+        mode: '0755'
+
+    - name: Deploy Prometheus stack
+      shell: |
+        docker service create \
+          --name prometheus \
+          --publish 9090:9090 \
+          --mount type=bind,source=/opt/monitoring,destination=/etc/prometheus \
+          --replicas 1 \
+          prom/prometheus
+      register: prometheus_result
+      failed_when: false
+      changed_when: "'already exists' not in prometheus_result.stderr"
+
+    - name: Deploy cAdvisor
+      shell: |
+        docker service create \
+          --name cadvisor \
+          --mode global \
+          --publish 8080:8080 \
+          --mount type=bind,source=/,destination=/rootfs,readonly=true \
+          --mount type=bind,source=/var/run,destination=/var/run,readonly=false \
+          --mount type=bind,source=/sys,destination=/sys,readonly=true \
+          --mount type=bind,source=/var/lib/docker,destination=/var/lib/docker,readonly=true \
+          google/cadvisor:latest
+      register: cadvisor_result
+      failed_when: false
+      changed_when: "'already exists' not in cadvisor_result.stderr"
+
+    - name: Display monitoring services status
+      shell: docker service ls
+      register: services_status
+
+    - name: Show services
+      debug:
+        var: services_status.stdout_lines

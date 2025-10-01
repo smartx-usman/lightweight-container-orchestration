@@ -1,0 +1,18 @@
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Cluster Configuration
+cluster_name = "lightweight-container-cluster"
+environment  = "dev"
+
+# Network Configuration
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+allowed_ssh_cidr   = ["0.0.0.0/0"] # Replace with your IP for better security
+
+# EC2 Configuration
+key_name               = "your-key-pair-name" # Replace with your AWS key pair name
+master_instance_type   = "t3.medium"
+worker_instance_type   = "t3.small"
+worker_count           = 2
+root_volume_size       = 30

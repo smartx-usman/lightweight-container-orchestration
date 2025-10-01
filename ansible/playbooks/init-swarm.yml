@@ -1,0 +1,65 @@
+---
+- name: Initialize Docker Swarm on Master
+  hosts: master
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Check if Swarm is already initialized
+      shell: docker info | grep -i 'swarm'
+      register: swarm_status
+      changed_when: false
+      failed_when: false
+
+    - name: Initialize Docker Swarm
+      shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
+      when: "'inactive' in swarm_status.stdout"
+      register: swarm_init
+
+    - name: Get Swarm worker join token
+      shell: docker swarm join-token -q worker
+      register: worker_token
+      changed_when: false
+
+    - name: Get Swarm manager join token
+      shell: docker swarm join-token -q manager
+      register: manager_token
+      changed_when: false
+
+    - name: Save join tokens
+      set_fact:
+        swarm_worker_token: "{{ worker_token.stdout }}"
+        swarm_manager_token: "{{ manager_token.stdout }}"
+        swarm_master_ip: "{{ ansible_default_ipv4.address }}"
+
+- name: Join Workers to Swarm
+  hosts: workers
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Check if already part of a Swarm
+      shell: docker info | grep -i 'swarm'
+      register: swarm_status
+      changed_when: false
+      failed_when: false
+
+    - name: Join Docker Swarm as worker
+      shell: >
+        docker swarm join
+        --token {{ hostvars[groups['master'][0]]['swarm_worker_token'] }}
+        {{ hostvars[groups['master'][0]]['swarm_master_ip'] }}:2377
+      when: "'inactive' in swarm_status.stdout"
+
+- name: Verify Swarm Cluster
+  hosts: master
+  become: yes
+
+  tasks:
+    - name: List Swarm nodes
+      shell: docker node ls
+      register: swarm_nodes
+
+    - name: Display Swarm nodes
+      debug:
+        var: swarm_nodes.stdout_lines
