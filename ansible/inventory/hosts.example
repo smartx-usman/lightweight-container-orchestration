@@ -1,0 +1,29 @@
+# Ansible Inventory Example
+# Copy this file to 'hosts' and customize for your environment
+
+[all:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+# Container hosts
+[container_hosts]
+host1.example.com ansible_host=192.168.1.10
+host2.example.com ansible_host=192.168.1.11
+
+# Management/control plane
+[control_plane]
+control.example.com ansible_host=192.168.1.20
+
+# Worker nodes
+[workers]
+worker1.example.com ansible_host=192.168.1.21
+worker2.example.com ansible_host=192.168.1.22
+
+# Monitoring nodes
+[monitoring]
+monitor.example.com ansible_host=192.168.1.30
+
+# Group assignments
+[orchestration:children]
+control_plane
+workers
